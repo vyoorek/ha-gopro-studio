@@ -11,7 +11,7 @@ Tested with **HERO13 Black** running GoPro Labs firmware (H24.01.02.10.70).
 | Sensor | battery, SD free space and capacity, remaining video time, remaining photos, video/photo count, recording time, camera state, active mode, SD status, Wi-Fi signal, last captured file, media count |
 | Binary sensor | recording, busy, overheating, too cold, charging, SD problem, USB, preview active |
 | Switch | **record** (start/stop), keep awake (keep-alive), turbo transfer, external control (locks the camera UI) |
-| Button | shutter / take photo, stop, HiLight, sync time, locate (beep), sleep, refresh media, download latest file |
+| Button | shutter (photo, or start/stop like the camera button), HiLight, sync time, locate (beep), sleep, refresh media, download latest file |
 | Select | mode (video/photo/timelapse), **preset** (including custom presets), and **every camera setting** read from the camera schema. Options are filtered by the camera's own rules, so only valid values are shown. Main settings are enabled by default; the rest are in the entity registry. |
 | Number | digital zoom |
 | Text | **Labs command**: anything typed here is sent to the camera |

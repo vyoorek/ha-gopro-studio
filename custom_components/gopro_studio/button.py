@@ -9,9 +9,10 @@ from typing import Any
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import ST_ENCODING
+from .const import DOMAIN, ST_ENCODING
 from .entity import GoProEntity
 
 
@@ -44,7 +45,6 @@ class GoProButtonDescription(ButtonEntityDescription):
 
 BUTTONS: tuple[GoProButtonDescription, ...] = (
     GoProButtonDescription(key="shutter", translation_key="shutter", press_fn=_shutter),
-    GoProButtonDescription(key="stop", translation_key="stop", press_fn=lambda b: b.api.shutter(False)),
     GoProButtonDescription(key="hilight", translation_key="hilight", press_fn=lambda b: b.api.hilight()),
     GoProButtonDescription(key="sync_time", translation_key="sync_time", entity_category=EntityCategory.CONFIG,
                            press_fn=lambda b: b.api.sync_time()),
@@ -61,6 +61,10 @@ BUTTONS: tuple[GoProButtonDescription, ...] = (
 
 async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities: AddEntitiesCallback) -> None:
     coord = entry.runtime_data.coordinator
+    # "stop" zastąpiony przełącznikiem nagrywania - usuń starą encję
+    reg = er.async_get(hass)
+    if old := reg.async_get_entity_id("button", DOMAIN, f"{coord.serial}_stop"):
+        reg.async_remove(old)
     async_add_entities(GoProButton(coord, d) for d in BUTTONS)
 
 

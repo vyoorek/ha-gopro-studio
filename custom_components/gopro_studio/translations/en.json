@@ -4,15 +4,28 @@
       "user": {
         "title": "GoPro camera",
         "description": "Camera on the Home Network (COHN) uses HTTPS with username and password (the GoPro Labs command $SHPS=20 shows them on the camera). For camera Wi-Fi / USB disable HTTPS.",
-        "data": {"host": "IP address", "username": "Username", "password": "Password", "https": "HTTPS (COHN)"}
+        "data": {
+          "host": "IP address",
+          "username": "Username",
+          "password": "Password",
+          "https": "HTTPS (COHN)"
+        }
       },
       "reconfigure": {
         "title": "Change camera connection",
-        "data": {"host": "IP address", "username": "Username", "password": "Password", "https": "HTTPS (COHN)"}
+        "data": {
+          "host": "IP address",
+          "username": "Username",
+          "password": "Password",
+          "https": "HTTPS (COHN)"
+        }
       },
       "reauth_confirm": {
         "title": "Camera credentials changed",
-        "data": {"username": "Username", "password": "Password"}
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -43,114 +56,288 @@
   },
   "entity": {
     "sensor": {
-      "battery": {"name": "Battery"},
-      "sd_free": {"name": "SD free space"},
-      "sd_capacity": {"name": "SD capacity"},
-      "video_remaining": {"name": "Video time remaining"},
-      "photos_remaining": {"name": "Photos remaining"},
-      "video_count": {"name": "Videos on card"},
-      "photo_count": {"name": "Photos on card"},
-      "recording_time": {"name": "Recording time"},
-      "camera_state": {"name": "Camera state", "state": {"ready": "Ready", "busy": "Busy", "recording": "Recording"}},
-      "active_mode": {"name": "Active mode", "state": {"video": "Video", "photo": "Photo", "timelapse": "Timelapse"}},
-      "sd_status": {"name": "SD card status", "state": {"ok": "OK", "full": "Full", "removed": "Removed", "format_error": "Format error", "busy": "Busy", "swapped": "Swapped", "unknown": "Unknown"}},
-      "wifi_signal": {"name": "Wi-Fi signal (bars)"},
-      "last_captured": {"name": "Last captured file"},
-      "media_on_card": {"name": "Media items on card"}
+      "battery": {
+        "name": "Battery"
+      },
+      "sd_free": {
+        "name": "SD free space"
+      },
+      "sd_capacity": {
+        "name": "SD capacity"
+      },
+      "video_remaining": {
+        "name": "Video time remaining"
+      },
+      "photos_remaining": {
+        "name": "Photos remaining"
+      },
+      "video_count": {
+        "name": "Videos on card"
+      },
+      "photo_count": {
+        "name": "Photos on card"
+      },
+      "recording_time": {
+        "name": "Recording time"
+      },
+      "camera_state": {
+        "name": "Camera state",
+        "state": {
+          "ready": "Ready",
+          "busy": "Busy",
+          "recording": "Recording"
+        }
+      },
+      "active_mode": {
+        "name": "Active mode",
+        "state": {
+          "video": "Video",
+          "photo": "Photo",
+          "timelapse": "Timelapse"
+        }
+      },
+      "sd_status": {
+        "name": "SD card status",
+        "state": {
+          "ok": "OK",
+          "full": "Full",
+          "removed": "Removed",
+          "format_error": "Format error",
+          "busy": "Busy",
+          "swapped": "Swapped",
+          "unknown": "Unknown"
+        }
+      },
+      "wifi_signal": {
+        "name": "Wi-Fi signal (bars)"
+      },
+      "last_captured": {
+        "name": "Last captured file"
+      },
+      "media_on_card": {
+        "name": "Media items on card"
+      }
     },
     "binary_sensor": {
-      "recording": {"name": "Recording"},
-      "busy": {"name": "Busy"},
-      "overheating": {"name": "Overheating"},
-      "too_cold": {"name": "Too cold"},
-      "charging": {"name": "Charging"},
-      "sd_problem": {"name": "SD card problem"},
-      "usb": {"name": "USB connected"},
-      "preview_active": {"name": "Preview stream active"}
+      "recording": {
+        "name": "Recording"
+      },
+      "busy": {
+        "name": "Busy"
+      },
+      "overheating": {
+        "name": "Overheating"
+      },
+      "too_cold": {
+        "name": "Too cold"
+      },
+      "charging": {
+        "name": "Charging"
+      },
+      "sd_problem": {
+        "name": "SD card problem"
+      },
+      "usb": {
+        "name": "USB connected"
+      },
+      "preview_active": {
+        "name": "Preview stream active"
+      }
     },
     "switch": {
-      "record": {"name": "Record"},
-      "keep_alive": {"name": "Keep awake"},
-      "turbo": {"name": "Turbo transfer"},
-      "external_control": {"name": "External control (lock camera UI)"}
+      "record": {
+        "name": "Record"
+      },
+      "keep_alive": {
+        "name": "Keep awake"
+      },
+      "turbo": {
+        "name": "Turbo transfer"
+      },
+      "external_control": {
+        "name": "External control (lock camera UI)"
+      }
     },
     "button": {
-      "shutter": {"name": "Shutter / take photo"},
-      "stop": {"name": "Stop capture"},
-      "hilight": {"name": "HiLight"},
-      "sync_time": {"name": "Sync time"},
-      "locate": {"name": "Locate (beep)"},
-      "sleep": {"name": "Put to sleep"},
-      "refresh_media": {"name": "Refresh media list"},
-      "download_latest": {"name": "Download latest file"}
+      "shutter": {
+        "name": "Shutter"
+      },
+      "hilight": {
+        "name": "HiLight"
+      },
+      "sync_time": {
+        "name": "Sync time"
+      },
+      "locate": {
+        "name": "Locate (beep)"
+      },
+      "sleep": {
+        "name": "Put to sleep"
+      },
+      "refresh_media": {
+        "name": "Refresh media list"
+      },
+      "download_latest": {
+        "name": "Download latest file"
+      }
     },
     "select": {
-      "mode": {"name": "Mode", "state": {"video": "Video", "photo": "Photo", "timelapse": "Timelapse"}},
-      "preset": {"name": "Preset"}
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "video": "Video",
+          "photo": "Photo",
+          "timelapse": "Timelapse"
+        }
+      },
+      "preset": {
+        "name": "Preset"
+      }
     },
-    "number": {"zoom": {"name": "Digital zoom"}},
-    "text": {"labs_command": {"name": "Labs command"}},
-    "camera": {"camera": {"name": "Camera"}}
+    "number": {
+      "zoom": {
+        "name": "Digital zoom"
+      }
+    },
+    "text": {
+      "labs_command": {
+        "name": "Labs command"
+      }
+    },
+    "camera": {
+      "camera": {
+        "name": "Camera"
+      }
+    }
   },
   "selector": {
-    "download_files": {"options": {"latest": "Latest", "new": "Not yet downloaded", "all": "All"}}
+    "download_files": {
+      "options": {
+        "latest": "Latest",
+        "new": "Not yet downloaded",
+        "all": "All"
+      }
+    }
   },
   "services": {
     "labs_command": {
       "name": "Send GoPro Labs command",
       "description": "Sends a GoPro Labs command over Wi-Fi (Labs firmware, HERO13 2.04.70+), no QR code needed.",
       "fields": {
-        "config_entry_id": {"name": "Camera", "description": "Camera (optional when only one is configured)."},
-        "command": {"name": "Command", "description": "Labs command, e.g. $HIST=5$LEVL=5 or *BITR=200."}
+        "config_entry_id": {
+          "name": "Camera",
+          "description": "Camera (optional when only one is configured)."
+        },
+        "command": {
+          "name": "Command",
+          "description": "Labs command, e.g. $HIST=5$LEVL=5 or *BITR=200."
+        }
       }
     },
     "set_setting": {
       "name": "Set camera setting",
       "description": "Sets a camera setting by Open GoPro IDs.",
       "fields": {
-        "config_entry_id": {"name": "Camera", "description": "Camera (optional)."},
-        "setting_id": {"name": "Setting ID", "description": "e.g. 2 = resolution."},
-        "option_id": {"name": "Option ID", "description": "e.g. 108 = 4K 8:7."}
+        "config_entry_id": {
+          "name": "Camera",
+          "description": "Camera (optional)."
+        },
+        "setting_id": {
+          "name": "Setting ID",
+          "description": "e.g. 2 = resolution."
+        },
+        "option_id": {
+          "name": "Option ID",
+          "description": "e.g. 108 = 4K 8:7."
+        }
       }
     },
     "load_preset": {
       "name": "Load preset",
       "description": "Loads a camera preset by its ID.",
       "fields": {
-        "config_entry_id": {"name": "Camera", "description": "Camera (optional)."},
-        "preset_id": {"name": "Preset ID", "description": "Preset ID (see attributes of the preset select)."}
+        "config_entry_id": {
+          "name": "Camera",
+          "description": "Camera (optional)."
+        },
+        "preset_id": {
+          "name": "Preset ID",
+          "description": "Preset ID (see attributes of the preset select)."
+        }
       }
     },
     "download_media": {
       "name": "Download media",
       "description": "Downloads files from the camera to Home Assistant (default /media/gopro), including RAW .GPR.",
       "fields": {
-        "config_entry_id": {"name": "Camera", "description": "Camera (optional)."},
-        "files": {"name": "Files", "description": "Which files to download."},
-        "path": {"name": "Path", "description": "A specific file, e.g. 100GOPRO/GX010001.MP4 (overrides Files)."},
-        "include_raw": {"name": "Include RAW", "description": "Also download .GPR files of RAW photos."},
-        "include_lrv": {"name": "Include LRV", "description": "Also download low-resolution .LRV proxies."},
-        "directory": {"name": "Directory", "description": "Target directory."},
-        "by_date": {"name": "Folders by date", "description": "Save into YYYY-MM-DD subfolders."},
-        "skip_existing": {"name": "Skip existing", "description": "Do not download files that already exist."},
-        "delete_after": {"name": "Delete after download", "description": "Delete from the camera after a successful download."}
+        "config_entry_id": {
+          "name": "Camera",
+          "description": "Camera (optional)."
+        },
+        "files": {
+          "name": "Files",
+          "description": "Which files to download."
+        },
+        "path": {
+          "name": "Path",
+          "description": "A specific file, e.g. 100GOPRO/GX010001.MP4 (overrides Files)."
+        },
+        "include_raw": {
+          "name": "Include RAW",
+          "description": "Also download .GPR files of RAW photos."
+        },
+        "include_lrv": {
+          "name": "Include LRV",
+          "description": "Also download low-resolution .LRV proxies."
+        },
+        "directory": {
+          "name": "Directory",
+          "description": "Target directory."
+        },
+        "by_date": {
+          "name": "Folders by date",
+          "description": "Save into YYYY-MM-DD subfolders."
+        },
+        "skip_existing": {
+          "name": "Skip existing",
+          "description": "Do not download files that already exist."
+        },
+        "delete_after": {
+          "name": "Delete after download",
+          "description": "Delete from the camera after a successful download."
+        }
       }
     },
     "delete_media": {
       "name": "Delete media",
       "description": "Deletes a file (or all files) from the camera SD card.",
       "fields": {
-        "config_entry_id": {"name": "Camera", "description": "Camera (optional)."},
-        "path": {"name": "Path", "description": "File to delete, e.g. 100GOPRO/GX010001.MP4."},
-        "all": {"name": "All files", "description": "Delete ALL files from the card."}
+        "config_entry_id": {
+          "name": "Camera",
+          "description": "Camera (optional)."
+        },
+        "path": {
+          "name": "Path",
+          "description": "File to delete, e.g. 100GOPRO/GX010001.MP4."
+        },
+        "all": {
+          "name": "All files",
+          "description": "Delete ALL files from the card."
+        }
       }
     },
     "http_get": {
       "name": "Raw API request",
       "description": "Sends any GET request to the Open GoPro API and returns the response.",
       "fields": {
-        "config_entry_id": {"name": "Camera", "description": "Camera (optional)."},
-        "path": {"name": "Path", "description": "e.g. /gopro/camera/state"}
+        "config_entry_id": {
+          "name": "Camera",
+          "description": "Camera (optional)."
+        },
+        "path": {
+          "name": "Path",
+          "description": "e.g. /gopro/camera/state"
+        }
       }
     }
   }
