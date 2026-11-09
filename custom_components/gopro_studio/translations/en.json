@@ -49,7 +49,10 @@
           "keep_alive": "Keep the camera awake (keep-alive)",
           "preview": "Live preview in the camera entity (experimental, UDP)",
           "preview_port": "Preview UDP port",
-          "download_dir": "Download folder (empty = /media/gopro)"
+          "download_dir": "Download folder (empty = /media/gopro)",
+          "auto_download_photo": "Download photos to HA right after capture",
+          "auto_download_video": "Download videos to HA when recording stops",
+          "auto_download_timelapse": "Download time-lapses to HA when they finish"
         }
       }
     }
@@ -191,7 +194,7 @@
         }
       },
       "preset": {
-        "name": "Preset"
+        "name": "Mode preset"
       }
     },
     "number": {
@@ -339,6 +342,28 @@
           "description": "e.g. /gopro/camera/state"
         }
       }
+    }
+  },
+  "exceptions": {
+    "option_rejected": {
+      "message": "The camera rejected \"{option}\" for {setting}: not available with the current settings (resolution, frame rate, lens). Details: {error}"
+    },
+    "hilight_not_recording": {
+      "message": "HiLight works only while recording."
+    }
+  },
+  "device": {
+    "section_video": {
+      "name": "{model} – Video"
+    },
+    "section_photo": {
+      "name": "{model} – Photo"
+    },
+    "section_timelapse": {
+      "name": "{model} – Time Lapse"
+    },
+    "section_general": {
+      "name": "{model} – General settings"
     }
   }
 }

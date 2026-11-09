@@ -32,7 +32,7 @@ async def _shutter(btn: "GoProButton"):
 async def _hilight(btn: "GoProButton"):
     """Kamera przyjmuje znacznik HiLight tylko w trakcie nagrywania (inaczej HTTP 500)."""
     if not btn.coordinator.status(ST_ENCODING):
-        raise HomeAssistantError("HiLight works only while recording")
+        raise HomeAssistantError(translation_domain=DOMAIN, translation_key="hilight_not_recording")
     await btn.api.hilight()
 
 

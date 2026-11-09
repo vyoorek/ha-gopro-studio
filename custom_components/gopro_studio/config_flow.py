@@ -11,7 +11,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import GoProApi, GoProAuthError, GoProError
-from .const import (CONF_DOWNLOAD_DIR, CONF_HTTPS, CONF_KEEP_ALIVE, CONF_PREVIEW, CONF_PREVIEW_PORT,
+from .const import (CONF_AUTO_PHOTO, CONF_AUTO_TIMELAPSE, CONF_AUTO_VIDEO, CONF_DOWNLOAD_DIR, CONF_HTTPS, CONF_KEEP_ALIVE, CONF_PREVIEW, CONF_PREVIEW_PORT,
                     CONF_SCAN_INTERVAL, DEFAULT_KEEP_ALIVE, DEFAULT_PREVIEW, DEFAULT_PREVIEW_PORT,
                     DEFAULT_SCAN_INTERVAL, DEFAULT_USERNAME, DOMAIN)
 
@@ -103,5 +103,8 @@ class GoProStudioOptionsFlow(OptionsFlow):
             vol.Optional(CONF_PREVIEW, default=o.get(CONF_PREVIEW, DEFAULT_PREVIEW)): bool,
             vol.Optional(CONF_PREVIEW_PORT, default=o.get(CONF_PREVIEW_PORT, DEFAULT_PREVIEW_PORT)):
                 vol.All(vol.Coerce(int), vol.Range(min=1024, max=65535)),
+            vol.Optional(CONF_AUTO_PHOTO, default=o.get(CONF_AUTO_PHOTO, False)): bool,
+            vol.Optional(CONF_AUTO_VIDEO, default=o.get(CONF_AUTO_VIDEO, False)): bool,
+            vol.Optional(CONF_AUTO_TIMELAPSE, default=o.get(CONF_AUTO_TIMELAPSE, False)): bool,
             vol.Optional(CONF_DOWNLOAD_DIR, default=o.get(CONF_DOWNLOAD_DIR, "")): str,
         }))

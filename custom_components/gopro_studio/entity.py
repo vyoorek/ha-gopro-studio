@@ -15,10 +15,21 @@ from .coordinator import GoProCoordinator
 class GoProEntity(CoordinatorEntity[GoProCoordinator]):
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator: GoProCoordinator, key: str) -> None:
+    def __init__(self, coordinator: GoProCoordinator, key: str, section: str | None = None) -> None:
         super().__init__(coordinator)
         info = coordinator.info
         self._attr_unique_id = f"{coordinator.serial}_{key}"
+        if section:
+            # osobna karta w HA dla ustawień danego trybu
+            self._attr_device_info = DeviceInfo(
+                identifiers={(DOMAIN, f"{coordinator.serial}_{section}")},
+                via_device=(DOMAIN, coordinator.serial),
+                manufacturer=MANUFACTURER,
+                model=info.get("model_name"),
+                translation_key=f"section_{section}",
+                translation_placeholders={"model": info.get("model_name", "GoPro")},
+            )
+            return
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, coordinator.serial)},
             manufacturer=MANUFACTURER,

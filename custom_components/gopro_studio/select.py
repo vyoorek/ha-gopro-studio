@@ -7,9 +7,11 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import GROUP_OPTIONS, PRIMARY_SETTINGS, ST_GROUP, ST_PRESET
+from .api import GoProError
+from .const import DOMAIN, GROUP_OPTIONS, SETTING_NAME_OVERRIDES, PRIMARY_SETTINGS, ST_GROUP, ST_PRESET
 from .coordinator import GoProCoordinator
 from .entity import GoProEntity
 
@@ -18,16 +20,26 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities: AddE
     coord: GoProCoordinator = entry.runtime_data.coordinator
     entities: list[SelectEntity] = [ModeSelect(coord, "mode"), PresetSelect(coord, "preset")]
     present = {int(k) for k in (coord.data or {}).get("settings", {})}
-    names = Counter(coord.schema_settings[s]["display_name"] for s in present if s in coord.schema_settings)
-    for sid in sorted(present):
-        meta = coord.schema_settings.get(sid)
-        if not meta or not meta.get("options"):
-            continue
-        name = meta["display_name"]
-        if names[name] > 1:
-            cat = coord.setting_category.get(sid)
-            name = f"{name} ({cat})" if cat else f"{name} #{sid}"
+    sids = [s for s in sorted(present)
+            if coord.schema_settings.get(s, {}).get("options") and s not in coord.hidden_settings]
+    base = {s: SETTING_NAME_OVERRIDES.get(s, coord.schema_settings[s]["display_name"]) for s in sids}
+    sec = coord.setting_section
+    counts = Counter((sec.get(s), base[s]) for s in sids)
+    named = {}
+    for sid in sids:
+        name = base[sid]
+        if counts[(sec.get(sid), name)] > 1 and coord.setting_category.get(sid):
+            name = f"{name} ({coord.setting_category[sid]})"
+        named[sid] = name
+    counts = Counter((sec.get(s), named[s]) for s in sids)
+    for sid in sids:
+        name = named[sid] if counts[(sec.get(sid), named[sid])] == 1 else f"{named[sid]} #{sid}"
         entities.append(SettingSelect(coord, sid, name))
+    # usuń encje ustawień, których już nie tworzymy (np. ustawienia transmisji)
+    reg = er.async_get(hass)
+    for sid in coord.hidden_settings:
+        if old := reg.async_get_entity_id("select", DOMAIN, f"{coord.serial}_setting_{sid}"):
+            reg.async_remove(old)
     async_add_entities(entities)
 
 
@@ -79,7 +91,7 @@ class SettingSelect(GoProEntity, SelectEntity):
     _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(self, coordinator: GoProCoordinator, sid: int, name: str) -> None:
-        super().__init__(coordinator, f"setting_{sid}")
+        super().__init__(coordinator, f"setting_{sid}", coordinator.setting_section.get(sid))
         self.sid = sid
         self._attr_name = name
         self._attr_entity_registry_enabled_default = sid in PRIMARY_SETTINGS
@@ -87,7 +99,8 @@ class SettingSelect(GoProEntity, SelectEntity):
 
     @property
     def available(self) -> bool:
-        return super().available and self.coordinator.setting(self.sid) is not None
+        return (super().available and self.coordinator.setting(self.sid) is not None
+                and self.coordinator.setting_applies(self.sid))
 
     @property
     def options(self) -> list[str]:
@@ -101,10 +114,19 @@ class SettingSelect(GoProEntity, SelectEntity):
     @property
     def extra_state_attributes(self):
         return {"setting_id": self.sid, "option_id": self.coordinator.setting(self.sid),
-                "category": self.coordinator.setting_category.get(self.sid)}
+                "section": self.coordinator.setting_section.get(self.sid),
+                "category": self.coordinator.setting_category.get(self.sid),
+                "locked_by": self.coordinator.locked_by(self.sid) or None}
 
     async def async_select_option(self, option: str) -> None:
         oid = next((o for o, lbl in self.coordinator.allowed_options(self.sid) if lbl == option), None)
         if oid is None:
             raise HomeAssistantError(f"Option {option} is not allowed in the current configuration")
-        await self._call(self.api.set_setting(self.sid, oid))
+        try:
+            await self.api.set_setting(self.sid, oid)
+        except GoProError as err:
+            await self.coordinator.async_request_refresh()
+            raise HomeAssistantError(translation_domain=DOMAIN, translation_key="option_rejected",
+                                     translation_placeholders={"setting": str(self.name or ""), "option": option,
+                                                               "error": str(err)}) from err
+        await self.coordinator.async_request_refresh()

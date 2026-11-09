@@ -49,7 +49,10 @@
           "keep_alive": "Nie usypiaj kamery (keep-alive)",
           "preview": "Podgląd na żywo w encji kamery (eksperymentalne, UDP)",
           "preview_port": "Port UDP podglądu",
-          "download_dir": "Folder pobierania (puste = /media/gopro)"
+          "download_dir": "Folder pobierania (puste = /media/gopro)",
+          "auto_download_photo": "Pobieraj zdjęcia do HA od razu po zrobieniu",
+          "auto_download_video": "Pobieraj filmy do HA po zakończeniu nagrywania",
+          "auto_download_timelapse": "Pobieraj timelapse do HA po zakończeniu"
         }
       }
     }
@@ -191,7 +194,7 @@
         }
       },
       "preset": {
-        "name": "Preset"
+        "name": "Tryb – preset"
       }
     },
     "number": {
@@ -339,6 +342,28 @@
           "description": "np. /gopro/camera/state"
         }
       }
+    }
+  },
+  "exceptions": {
+    "option_rejected": {
+      "message": "Kamera odrzuciła „{option}” dla ustawienia {setting}: opcja niedostępna przy obecnych ustawieniach (rozdzielczość, kl./s, obiektyw). Szczegóły: {error}"
+    },
+    "hilight_not_recording": {
+      "message": "HiLight działa tylko w trakcie nagrywania."
+    }
+  },
+  "device": {
+    "section_video": {
+      "name": "{model} – Wideo"
+    },
+    "section_photo": {
+      "name": "{model} – Zdjęcie"
+    },
+    "section_timelapse": {
+      "name": "{model} – Timelapse"
+    },
+    "section_general": {
+      "name": "{model} – Ustawienia ogólne"
     }
   }
 }

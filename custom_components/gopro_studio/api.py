@@ -60,6 +60,9 @@ class GoProApi:
                     try:
                         j = json.loads(msg)
                         msg = j.get("error") or j.get("message") or msg
+                        if j.get("supported_options"):
+                            msg = f"{msg} (supported: " + ", ".join(
+                                str(o.get("display_name", o.get("id"))) for o in j["supported_options"]) + ")"
                     except (ValueError, AttributeError):
                         pass
                     raise GoProError(f"HTTP {resp.status} {path}: {msg}")

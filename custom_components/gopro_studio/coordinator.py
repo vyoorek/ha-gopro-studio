@@ -12,7 +12,8 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .api import GoProApi, GoProAuthError, GoProError
-from .const import (CONF_KEEP_ALIVE, CONF_SCAN_INTERVAL, DEFAULT_KEEP_ALIVE, DEFAULT_SCAN_INTERVAL, DOMAIN,
+from .const import (AUTO_DOWNLOAD_OPTION, FLATMODE_SECTION, HIDDEN_CATEGORIES, HIDDEN_SETTINGS, SETTING_REQUIRES, SECTION_GENERAL,
+                    SECTION_OVERRIDES, SECTION_TIMELAPSE, SECTION_VIDEO, ST_FLATMODE, CONF_KEEP_ALIVE, CONF_SCAN_INTERVAL, DEFAULT_KEEP_ALIVE, DEFAULT_SCAN_INTERVAL, DOMAIN,
                     GROUP_KEYS, RESOLUTION_LABELS, SKIP_CATEGORIES, ST_BUSY, ST_ENCODING, ST_GROUP)
 from .media import MediaItem
 
@@ -47,16 +48,71 @@ class GoProCoordinator(DataUpdateCoordinator[dict]):
         self._prev_group = None
         self._was_encoding = False
         self._was_busy = False
+        self._capture_group = None
         self.schema_settings: dict[int, dict] = {s["id"]: s for s in schema.get("settings", [])}
         self.schema_filters: list = schema.get("filters", [])
         self.status_names = {f["id"]: f["name"] for g in schema.get("status", {}).get("groups", [])
                              for f in g.get("fields", [])}
         self.setting_category: dict[int, str] = {}
+        hidden: set[int] = set()
         for h in schema.get("display_hints", []):
+            if h.get("display_name") in HIDDEN_CATEGORIES:
+                hidden.update(s.get("setting_id") for s in h.get("settings", []))
+                continue
             if h.get("display_name") in SKIP_CATEGORIES:
                 continue
             for s in h.get("settings", []):
                 self.setting_category.setdefault(s.get("setting_id"), h.get("display_name", ""))
+        # ukrywamy tylko ustawienia występujące wyłącznie w sekcji transmisji (WB, EV itp. są też w Protune)
+        self.hidden_settings: set[int] = (hidden - set(self.setting_category)) | HIDDEN_SETTINGS
+
+        self.setting_modes: dict[int, set[int]] = {}
+        self.setting_section: dict[int, str] = {}
+        self._classify_settings()
+
+    def _classify_settings(self) -> None:
+        """Do jakich trybów (flatmode) należy ustawienie: reguły z jednym warunkiem na status 89,
+        które blokują wszystkie opcje, wskazują tryby, w których ustawienia nie ma."""
+        blocked: dict[int, set[int]] = {}
+        seen: set[int] = set()
+        for flt in self.schema_filters:
+            conds = flt.get("activated_by", [])
+            if len(conds) != 1 or conds[0].get("status_id") != ST_FLATMODE:
+                continue
+            modes = set(conds[0].get("values", []))
+            seen |= modes
+            for bl in flt.get("blacklist", []):
+                meta = self.schema_settings.get(bl.get("setting_id"))
+                if meta and {o["id"] for o in meta.get("options", [])} <= set(bl.get("opt_ids", [])):
+                    blocked.setdefault(meta["id"], set()).update(modes)
+        for sid in self.schema_settings:
+            if sid in SECTION_OVERRIDES:
+                self.setting_section[sid] = SECTION_OVERRIDES[sid]
+                continue
+            if sid not in blocked:
+                self.setting_section[sid] = SECTION_GENERAL
+                continue
+            modes = seen - blocked[sid]
+            self.setting_modes[sid] = modes
+            secs = {FLATMODE_SECTION[m] for m in modes if m in FLATMODE_SECTION}
+            if len(secs) == 1:
+                self.setting_section[sid] = secs.pop()
+            elif secs == {SECTION_VIDEO, SECTION_TIMELAPSE}:
+                self.setting_section[sid] = SECTION_VIDEO  # np. rozdzielczość, obiektyw wideo
+            elif len(secs) == 2:
+                # np. ISO dla serii zdjęć i nocnych timelapse - sekcja z większością trybów
+                self.setting_section[sid] = max(secs, key=lambda x: sum(
+                    FLATMODE_SECTION.get(m) == x for m in modes))
+            else:
+                self.setting_section[sid] = SECTION_GENERAL
+
+    def setting_applies(self, sid: int) -> bool:
+        """Czy ustawienie dotyczy bieżącego trybu kamery i trybu sterowania (Easy/Pro, Dashboard)."""
+        req = SETTING_REQUIRES.get(sid)
+        if req and self.setting(req[0]) not in req[1]:
+            return False
+        modes = self.setting_modes.get(sid)
+        return not modes or self.status(ST_FLATMODE, None) in modes
 
     # ------------------------------------------------------------------ aktualizacja
     @property
@@ -89,8 +145,12 @@ class GoProCoordinator(DataUpdateCoordinator[dict]):
 
         encoding = bool(status.get(str(ST_ENCODING)))
         busy = bool(status.get(str(ST_BUSY)))
-        if (self._was_encoding and not encoding) or (self._was_busy and not busy and not encoding) \
-                or not self.media_ts:
+        if encoding or busy:
+            self._capture_group = self._capture_group or group
+        if (self._was_encoding and not encoding) or (self._was_busy and not busy and not encoding):
+            cap_group, self._capture_group = self._capture_group or group, None
+            self.hass.async_create_task(self.async_refresh_media(auto_group=cap_group))
+        elif not self.media_ts:
             self.hass.async_create_task(self.async_refresh_media())
         self._was_encoding, self._was_busy = encoding, busy
         return data
@@ -108,7 +168,9 @@ class GoProCoordinator(DataUpdateCoordinator[dict]):
                 presets[gid] = [(p["id"], _prettify_preset(p)) for p in g.get("presetArray", [])]
         self.presets = presets
 
-    async def async_refresh_media(self) -> None:
+    async def async_refresh_media(self, auto_group: int | None = None) -> None:
+        """Odświeża listę mediów; po zakończeniu nagrania/zdjęcia opcjonalnie pobiera nowy plik do HA."""
+        prev = self.last_captured
         try:
             self.media = await self.api.media_list()
             last = await self.api.last_captured()
@@ -119,6 +181,13 @@ class GoProCoordinator(DataUpdateCoordinator[dict]):
             return
         self.media_ts = time.time()
         self.async_update_listeners()
+        opt = AUTO_DOWNLOAD_OPTION.get(auto_group)
+        if opt and self.config_entry.options.get(opt) and self.last_captured and self.last_captured != prev:
+            item = self.find_media(self.last_captured)
+            if item:
+                from . import async_download_items
+                _LOGGER.debug("Auto-download %s", item.path)
+                self.hass.async_create_task(async_download_items(self.hass, self.config_entry, [item]))
 
     # ------------------------------------------------------------------ pomocnicze
     def status(self, sid: int, default: Any = 0) -> Any:
@@ -164,6 +233,26 @@ class GoProCoordinator(DataUpdateCoordinator[dict]):
             if labels.count(lbl) > 1:
                 lbl = f"{lbl} (#{o['id']})"
             out.append((o["id"], lbl))
+        return out
+
+    def locked_by(self, sid: int) -> list[str]:
+        """Ustawienia, które w obecnej konfiguracji blokują opcje danego ustawienia (np. HLG HDR -> Bit Depth)."""
+        settings = (self.data or {}).get("settings", {})
+        status = (self.data or {}).get("status", {})
+        out: list[str] = []
+        for flt in self.schema_filters:
+            if not any(bl.get("setting_id") == sid for bl in flt.get("blacklist", [])):
+                continue
+            conds = flt.get("activated_by", [])
+            if not all((settings.get(str(c["setting_id"])) in c.get("ids", [])) if "setting_id" in c
+                       else (status.get(str(c.get("status_id"))) in c.get("values", [])) for c in conds):
+                continue
+            for c in conds:
+                if "setting_id" in c and c["setting_id"] in self.schema_settings:
+                    other = c["setting_id"]
+                    txt = f"{self.schema_settings[other]['display_name']}: {self.option_label(other, settings.get(str(other)))}"
+                    if txt not in out:
+                        out.append(txt)
         return out
 
     def find_media(self, path: str) -> MediaItem | None:
