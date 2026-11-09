@@ -1,0 +1,14 @@
+{
+  "domain": "gopro_studio",
+  "name": "GoPro Studio",
+  "after_dependencies": ["media_source", "stream"],
+  "codeowners": ["@vyoorek"],
+  "config_flow": true,
+  "dependencies": ["http"],
+  "documentation": "https://github.com/vyoorek/ha-gopro-studio",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/vyoorek/ha-gopro-studio/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

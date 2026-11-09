@@ -1,0 +1,119 @@
+labs_command:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: gopro_studio
+    command:
+      required: true
+      example: '$HIST=5$LEVL=5'
+      selector:
+        text:
+
+set_setting:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: gopro_studio
+    setting_id:
+      required: true
+      example: 2
+      selector:
+        number:
+          min: 1
+          max: 1000
+          mode: box
+    option_id:
+      required: true
+      example: 108
+      selector:
+        number:
+          min: 0
+          max: 100000000
+          mode: box
+
+load_preset:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: gopro_studio
+    preset_id:
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 100000000
+          mode: box
+
+download_media:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: gopro_studio
+    files:
+      default: latest
+      selector:
+        select:
+          options:
+            - latest
+            - new
+            - all
+          translation_key: download_files
+    path:
+      example: 100GOPRO/GX010001.MP4
+      selector:
+        text:
+    include_raw:
+      default: true
+      selector:
+        boolean:
+    include_lrv:
+      default: false
+      selector:
+        boolean:
+    directory:
+      example: /media/gopro
+      selector:
+        text:
+    by_date:
+      default: true
+      selector:
+        boolean:
+    skip_existing:
+      default: true
+      selector:
+        boolean:
+    delete_after:
+      default: false
+      selector:
+        boolean:
+
+delete_media:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: gopro_studio
+    path:
+      example: 100GOPRO/GX010001.MP4
+      selector:
+        text:
+    all:
+      default: false
+      selector:
+        boolean:
+
+http_get:
+  fields:
+    config_entry_id:
+      selector:
+        config_entry:
+          integration: gopro_studio
+    path:
+      required: true
+      example: /gopro/camera/state
+      selector:
+        text:
