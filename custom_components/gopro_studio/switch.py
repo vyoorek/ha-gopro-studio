@@ -55,7 +55,6 @@ class KeepAliveSwitch(GoProEntity, SwitchEntity):
 class TurboSwitch(GoProEntity, SwitchEntity):
     _attr_translation_key = "turbo"
     _attr_entity_category = EntityCategory.CONFIG
-    _attr_entity_registry_enabled_default = False
 
     @property
     def is_on(self) -> bool:
@@ -73,7 +72,6 @@ class ExternalControlSwitch(GoProEntity, SwitchEntity):
 
     _attr_translation_key = "external_control"
     _attr_entity_category = EntityCategory.CONFIG
-    _attr_entity_registry_enabled_default = False
 
     @property
     def is_on(self) -> bool:

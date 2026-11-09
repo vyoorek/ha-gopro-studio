@@ -195,6 +195,18 @@
       },
       "preset": {
         "name": "Mode preset"
+      },
+      "setting_video": {
+        "name": "Video: {name}"
+      },
+      "setting_photo": {
+        "name": "Photo: {name}"
+      },
+      "setting_timelapse": {
+        "name": "Time Lapse: {name}"
+      },
+      "setting_general": {
+        "name": "General: {name}"
       }
     },
     "number": {
@@ -350,20 +362,6 @@
     },
     "hilight_not_recording": {
       "message": "HiLight works only while recording."
-    }
-  },
-  "device": {
-    "section_video": {
-      "name": "{model} – Video"
-    },
-    "section_photo": {
-      "name": "{model} – Photo"
-    },
-    "section_timelapse": {
-      "name": "{model} – Time Lapse"
-    },
-    "section_general": {
-      "name": "{model} – General settings"
     }
   }
 }

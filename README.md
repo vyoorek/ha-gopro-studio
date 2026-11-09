@@ -12,7 +12,7 @@ Tested with **HERO13 Black** running GoPro Labs firmware (H24.01.02.10.70).
 | Binary sensor | recording, busy, overheating, too cold, charging, SD problem, USB, preview active |
 | Switch | **record** (start/stop), keep awake (keep-alive), turbo transfer, external control (locks the camera UI) |
 | Button | shutter (photo, or start/stop like the camera button), HiLight, sync time, locate (beep), sleep, refresh media, download latest file |
-| Select | mode (video/photo/timelapse), **preset** (including custom presets), and **every camera setting** read from the camera schema, grouped into sub-devices **Video / Photo / Time Lapse / General settings**. Options are filtered by the camera's own rules; a setting that belongs to another mode (or to Easy controls / Dashboard) shows as unavailable, and the `locked_by` attribute tells which setting restricts the options (e.g. *HLG HDR: On* locks Bit Depth). Main settings are enabled by default; the rest are in the entity registry. |
+| Select | mode (video/photo/timelapse), **preset** (including custom presets), and **every camera setting** read from the camera schema, all on one screen, prefixed by section (**Video: / Photo: / Time Lapse: / General:**) so they sort together. Options are filtered by the camera's own rules; a setting that belongs to another mode (or to Easy controls / Dashboard) shows as unavailable, and the `locked_by` attribute tells which setting restricts the options (e.g. *HLG HDR: On* locks Bit Depth). All settings are enabled by default (except legacy lens duplicates). |
 | Number | digital zoom |
 | Text | **Labs command**: anything typed here is sent to the camera |
 | Camera | image of the last capture; optional live preview (experimental) |

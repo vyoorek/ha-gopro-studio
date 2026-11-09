@@ -27,6 +27,7 @@ def _schema(d: dict[str, Any]) -> vol.Schema:
 
 class GoProStudioConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
+    MINOR_VERSION = 2
 
     async def _validate(self, data: dict[str, Any]) -> tuple[dict | None, str | None]:
         api = GoProApi(async_get_clientsession(self.hass, verify_ssl=False), data[CONF_HOST],

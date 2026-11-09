@@ -11,7 +11,10 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .api import GoProError
-from .const import DOMAIN, GROUP_OPTIONS, SETTING_NAME_OVERRIDES, PRIMARY_SETTINGS, ST_GROUP, ST_PRESET
+from homeassistant.helpers import device_registry as dr
+
+from .const import (DOMAIN, GROUP_OPTIONS, LEGACY_SETTINGS, SECTIONS, SETTING_NAME_OVERRIDES, ST_GROUP,
+                    ST_PRESET)
 from .coordinator import GoProCoordinator
 from .entity import GoProEntity
 
@@ -40,6 +43,14 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities: AddE
     for sid in coord.hidden_settings:
         if old := reg.async_get_entity_id("select", DOMAIN, f"{coord.serial}_setting_{sid}"):
             reg.async_remove(old)
+    # wersja 1.1.0 tworzyła podurządzenia-sekcje: odepnij od nich encje (wrócą do głównego urządzenia)
+    # i dopiero wtedy usuń urządzenia, inaczej HA skasowałby encje razem z nimi
+    dev_reg = dr.async_get(hass)
+    for section in SECTIONS:
+        if dev := dev_reg.async_get_device(identifiers={(DOMAIN, f"{coord.serial}_{section}")}):
+            for ent in er.async_entries_for_device(reg, dev.id, include_disabled_entities=True):
+                reg.async_update_entity(ent.entity_id, device_id=None)
+            dev_reg.async_remove_device(dev.id)
     async_add_entities(entities)
 
 
@@ -91,10 +102,12 @@ class SettingSelect(GoProEntity, SelectEntity):
     _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(self, coordinator: GoProCoordinator, sid: int, name: str) -> None:
-        super().__init__(coordinator, f"setting_{sid}", coordinator.setting_section.get(sid))
+        super().__init__(coordinator, f"setting_{sid}")
         self.sid = sid
-        self._attr_name = name
-        self._attr_entity_registry_enabled_default = sid in PRIMARY_SETTINGS
+        # nazwa z przedrostkiem sekcji ("Wideo: Bit Depth") - HA sortuje alfabetycznie, więc sekcje są razem
+        self._attr_translation_key = f"setting_{coordinator.setting_section.get(sid, 'general')}"
+        self._attr_translation_placeholders = {"name": name}
+        self._attr_entity_registry_enabled_default = sid not in LEGACY_SETTINGS
         self._attr_icon = "mdi:tune-variant"
 
     @property

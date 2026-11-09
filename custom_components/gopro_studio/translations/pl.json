@@ -195,6 +195,18 @@
       },
       "preset": {
         "name": "Tryb – preset"
+      },
+      "setting_video": {
+        "name": "Wideo: {name}"
+      },
+      "setting_photo": {
+        "name": "Zdjęcie: {name}"
+      },
+      "setting_timelapse": {
+        "name": "Timelapse: {name}"
+      },
+      "setting_general": {
+        "name": "Ogólne: {name}"
       }
     },
     "number": {
@@ -350,20 +362,6 @@
     },
     "hilight_not_recording": {
       "message": "HiLight działa tylko w trakcie nagrywania."
-    }
-  },
-  "device": {
-    "section_video": {
-      "name": "{model} – Wideo"
-    },
-    "section_photo": {
-      "name": "{model} – Zdjęcie"
-    },
-    "section_timelapse": {
-      "name": "{model} – Timelapse"
-    },
-    "section_general": {
-      "name": "{model} – Ustawienia ogólne"
     }
   }
 }

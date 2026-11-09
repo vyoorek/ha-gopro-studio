@@ -64,6 +64,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: GoProConfigEntry) -> boo
     return True
 
 
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """1.2: wszystkie encje ustawień są domyślnie włączone - włącz te, które wyłączyła starsza wersja."""
+    if entry.version > 1:
+        return False
+    if entry.minor_version < 2:
+        from homeassistant.helpers import entity_registry as er
+        from .const import LEGACY_SETTINGS
+        reg = er.async_get(hass)
+        for ent in er.async_entries_for_config_entry(reg, entry.entry_id):
+            if ent.disabled_by is not er.RegistryEntryDisabler.INTEGRATION:
+                continue
+            if any(ent.unique_id.endswith(f"_setting_{sid}") for sid in LEGACY_SETTINGS):
+                continue
+            reg.async_update_entity(ent.entity_id, disabled_by=None)
+        hass.config_entries.async_update_entry(entry, minor_version=2)
+    return True
+
+
 async def _async_reload(hass: HomeAssistant, entry: GoProConfigEntry) -> None:
     await hass.config_entries.async_reload(entry.entry_id)
 

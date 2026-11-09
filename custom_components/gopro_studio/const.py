@@ -103,7 +103,10 @@ SETTING_REQUIRES = {
 # Ustawienia transmisji / kamery internetowej spoza tej kategorii
 HIDDEN_SETTINGS = {41, 42, 44, 45, 47, 62, 64}
 
-# Ustawienia włączone domyślnie (reszta jest dostępna, ale wyłączona w rejestrze encji)
+# Starsze duplikaty (121-123 = 229-231) - wyłączone domyślnie
+LEGACY_SETTINGS = {121, 122, 123}
+
+# Dawniej: ustawienia włączone domyślnie (nieużywane od 1.2.0, wszystkie poza LEGACY są włączone)
 PRIMARY_SETTINGS = {2, 3, 234, 229, 135, 182, 183, 184, 125, 227, 230, 144, 115, 116, 117, 118, 145,
                     225, 59, 195, 167, 186, 187}
 # Kategorie z gpControl, których nie zamieniamy w encje (to komendy, nie ustawienia)
