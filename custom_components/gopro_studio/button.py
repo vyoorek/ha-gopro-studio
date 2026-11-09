@@ -9,6 +9,7 @@ from typing import Any
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -28,6 +29,13 @@ async def _shutter(btn: "GoProButton"):
     await btn.api.shutter(not encoding)
 
 
+async def _hilight(btn: "GoProButton"):
+    """Kamera przyjmuje znacznik HiLight tylko w trakcie nagrywania (inaczej HTTP 500)."""
+    if not btn.coordinator.status(ST_ENCODING):
+        raise HomeAssistantError("HiLight works only while recording")
+    await btn.api.hilight()
+
+
 async def _download_latest(btn: "GoProButton"):
     from . import async_download_items
     coord = btn.coordinator
@@ -45,7 +53,7 @@ class GoProButtonDescription(ButtonEntityDescription):
 
 BUTTONS: tuple[GoProButtonDescription, ...] = (
     GoProButtonDescription(key="shutter", translation_key="shutter", press_fn=_shutter),
-    GoProButtonDescription(key="hilight", translation_key="hilight", press_fn=lambda b: b.api.hilight()),
+    GoProButtonDescription(key="hilight", translation_key="hilight", press_fn=_hilight),
     GoProButtonDescription(key="sync_time", translation_key="sync_time", entity_category=EntityCategory.CONFIG,
                            press_fn=lambda b: b.api.sync_time()),
     GoProButtonDescription(key="locate", translation_key="locate", press_fn=lambda b: _locate(b.api)),
