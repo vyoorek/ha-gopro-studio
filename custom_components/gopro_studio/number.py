@@ -6,7 +6,7 @@ from homeassistant.const import PERCENTAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import ST_ZOOM
+from .const import ST_ZOOM, ST_ZOOM_AVAILABLE
 from .entity import GoProEntity
 
 
@@ -21,6 +21,11 @@ class ZoomNumber(GoProEntity, NumberEntity):
     _attr_native_step = 1
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_mode = NumberMode.SLIDER
+
+    @property
+    def available(self) -> bool:
+        # status 77: zoom cyfrowy dostępny w bieżącym trybie/obiektywie
+        return super().available and bool(self.coordinator.status(ST_ZOOM_AVAILABLE, 1))
 
     @property
     def native_value(self):

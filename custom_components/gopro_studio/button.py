@@ -11,6 +11,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from .const import ST_ENCODING
 from .entity import GoProEntity
 
 
@@ -18,6 +19,12 @@ async def _locate(api):
     await api.locate(True)
     await asyncio.sleep(5)
     await api.locate(False)
+
+
+async def _shutter(btn: "GoProButton"):
+    """Jak przycisk na kamerze: w trakcie nagrywania zatrzymuje, w przeciwnym razie wyzwala."""
+    encoding = bool(btn.coordinator.status(ST_ENCODING))
+    await btn.api.shutter(not encoding)
 
 
 async def _download_latest(btn: "GoProButton"):
@@ -36,7 +43,7 @@ class GoProButtonDescription(ButtonEntityDescription):
 
 
 BUTTONS: tuple[GoProButtonDescription, ...] = (
-    GoProButtonDescription(key="shutter", translation_key="shutter", press_fn=lambda b: b.api.shutter(True)),
+    GoProButtonDescription(key="shutter", translation_key="shutter", press_fn=_shutter),
     GoProButtonDescription(key="stop", translation_key="stop", press_fn=lambda b: b.api.shutter(False)),
     GoProButtonDescription(key="hilight", translation_key="hilight", press_fn=lambda b: b.api.hilight()),
     GoProButtonDescription(key="sync_time", translation_key="sync_time", entity_category=EntityCategory.CONFIG,
