@@ -32,12 +32,24 @@ Tested with **HERO13 Black** running GoPro Labs firmware (H24.01.02.10.70).
 - `gopro_studio_download_finished`: `{camera, file, path}`
 - `gopro_studio_labs_sent`: `{camera, command}`
 
-## Installation (HACS)
+## Installation
 
-1. HACS → ⋮ → **Custom repositories** → add this repository URL as type **Integration**.
-2. Install **GoPro Studio** and restart Home Assistant.
-3. **Settings → Devices & services → Add integration → GoPro Studio**.
-4. Enter the camera IP and the COHN credentials (username `gopro` plus a password). On a Labs camera, the command `$SHPS=20` shows the credentials and `$ADDR=15` shows the IP.
+### Home Assistant 2026.11+ (Marketplace)
+
+1. **Settings → Marketplace** (administrators only; accept the warning the first time).
+2. **Add from link** (top right) → `vyoorek/ha-gopro-studio` → **Add**. If asked, connect GitHub (device code) and pick type **Integration**.
+3. Open **GoPro Studio** → **Install** → confirm the version → **Install**.
+4. If prompted, restart via **Settings → System → Repairs**.
+5. **Settings → Devices & services → Add integration → GoPro Studio**.
+6. Enter the camera IP and the COHN credentials (username `gopro` plus a password). On a Labs camera, the command `$SHPS=20` shows the credentials and `$ADDR=15` shows the IP.
+
+### Home Assistant 2026.10 or older (HACS)
+
+HACS → ⋮ → **Custom repositories** → this repository URL, type **Integration** → install **GoPro Studio**, restart, then add the integration as above.
+
+### Manual
+
+Copy `custom_components/gopro_studio` into `/config/custom_components/` and restart Home Assistant.
 
 ## Notes
 
